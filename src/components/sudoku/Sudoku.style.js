@@ -1,6 +1,7 @@
 import styled from "styled-components";
 
 const SudokuTableWraper = styled.div`
+  display: inline-grid;
   table {
     display: inline-table;
     border: 2px solid forestgreen;
