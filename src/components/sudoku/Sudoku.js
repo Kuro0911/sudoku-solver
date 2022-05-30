@@ -1,59 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SudokuTableWraper from "./Sudoku.style";
 
 function Sudoku() {
-  const [data, setData] = useState([
-    ["1", "2", ".", "4", ".", ".", "7", "8", "9"],
-    [".", ".", "6", ".", "8", "9", ".", "2", "3"],
-    ["7", ".", "9", ".", ".", "3", "4", ".", "6"],
-    ["2", ".", ".", "5", "6", ".", ".", "9", "1"],
-    [".", "6", "7", ".", "9", "1", "2", ".", "."],
-    [".", ".", ".", "2", "3", ".", ".", "6", "."],
-    ["3", "4", "5", ".", ".", "8", "9", "1", "."],
-    [".", "7", ".", "9", "1", "2", "3", "4", "5"],
-    ["9", ".", ".", "3", "4", ".", ".", ".", "8"],
-  ]);
+  function getRndInteger(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+  function* shuffle(array) {
+    var i = array.length;
+
+    while (i--) {
+      yield array.splice(Math.floor(Math.random() * (i + 1)), 1)[0];
+    }
+  }
+
+  const getNewArray = () => {
+    var arr = new Array(9).fill(0);
+    var nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    for (var i = 0; i < 9; i++) {
+      arr[i] = getRndInteger(0, 9);
+    }
+    return arr;
+  };
+  const getNewTable = () => {
+    var test = [];
+    for (var i = 0; i < 9; i++) {
+      test.push(getNewArray());
+    }
+    return test;
+  };
+  const [data, setData] = useState(getNewTable());
+  const solveTable = () => {
+    console.log(data);
+  };
+
   const handleClick = () => {
-    const temp = [
-      ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
-      ["4", "5", "6", "7", "8", "9", "1", "2", "3"],
-      ["7", "8", "9", "1", "2", "3", "4", "5", "6"],
-      ["2", "3", "4", "5", "6", "7", "8", "9", "1"],
-      ["5", "6", "7", "8", "9", "1", "2", "3", "4"],
-      ["8", "9", "1", "2", "3", "4", "5", "6", "7"],
-      ["3", "4", "5", "6", "7", "8", "9", "1", "2"],
-      ["6", "7", "8", "9", "1", "2", "3", "4", "5"],
-      ["9", "1", "2", "3", "4", "5", "6", "7", "8"],
-    ];
-    setData(temp);
+    solveTable();
   };
   const handleReset = () => {
-    const temp = [
-      ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
-      ["4", "5", "6", "7", "8", "9", "1", "2", "3"],
-      ["7", "8", "9", "1", "2", "3", "4", "5", "6"],
-      ["2", "3", "4", "5", "6", "7", "8", "9", "1"],
-      ["5", "6", "7", "8", "9", "1", "2", "3", "4"],
-      ["8", "9", "1", "2", "3", "4", "5", "6", "7"],
-      ["3", "4", "5", "6", "7", "8", "9", "1", "2"],
-      ["6", "7", "8", "9", "1", "2", "3", "4", "5"],
-      ["9", "1", "2", "3", "4", "5", "6", "7", "8"],
-    ];
-    setData(temp);
+    setData(getNewTable());
   };
-  console.log(data);
+  useEffect(() => {
+    var ranNums = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    console.log(ranNums);
+  }, []);
+
   return (
     <SudokuTableWraper>
       <table>
-        {data.map((val) => {
-          return (
-            <tr>
-              {val.map((i) => {
-                return <td>{i}</td>;
-              })}
-            </tr>
-          );
-        })}
+        <tbody>
+          {data.map((val) => {
+            return (
+              <tr>
+                {val.map((i) => {
+                  return <td>{i}</td>;
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
       </table>
       <button onClick={handleClick}>Solve</button>
       <button onClick={handleReset}>reset</button>

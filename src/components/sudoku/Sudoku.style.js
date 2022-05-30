@@ -8,7 +8,6 @@ const SudokuTableWraper = styled.div`
     width: 800px;
     height: 200px;
   }
-
   td {
     border: 1px solid black;
     text-align: center;
