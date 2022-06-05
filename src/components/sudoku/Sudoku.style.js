@@ -32,7 +32,10 @@ export const InputWrapper = styled.div`
     font-size: 20px;
     text-align: center;
     padding: 0px;
+    display: flex;
     border: 1px solid black;
+    align-items: center;
+    justify-content: center;
   }
 `;
 export const ButtonWrapper = styled.div`

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SudokuTableWraper, { ButtonWrapper, InputWrapper } from "./Sudoku.style";
 
 function Sudoku() {
@@ -30,19 +30,66 @@ function Sudoku() {
     // }
     return test;
   };
-  const [data, setData] = useState(getNewTable());
+  const [data, setData] = useState([]);
+  const [err, setErr] = useState(false);
+  const [solved, setSolved] = useState(false);
+
+  useEffect(() => {
+    setData(getNewTable);
+  }, []);
+
   const solveTable = () => {
-    console.log(data);
+    const _board = data;
+    sodokoSolver(_board);
+    setData(_board);
+    setSolved(true);
+    for (var i = 0; i < 9; i++) {
+      for (var j = 0; j < 9; j++) {
+        if (_board[i][j] === 0) {
+          setErr(true);
+        }
+      }
+    }
+    function isValid(board, row, col, k) {
+      for (let i = 0; i < 9; i++) {
+        const m = 3 * Math.floor(row / 3) + Math.floor(i / 3);
+        const n = 3 * Math.floor(col / 3) + (i % 3);
+        if (board[row][i] === k || board[i][col] === k || board[m][n] === k) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function sodokoSolver(data) {
+      for (let i = 0; i < 9; i++) {
+        for (let j = 0; j < 9; j++) {
+          if (data[i][j] === 0) {
+            for (let k = 1; k <= 9; k++) {
+              if (isValid(data, i, j, k)) {
+                data[i][j] = k;
+                if (sodokoSolver(data)) {
+                  return true;
+                } else {
+                  data[i][j] = 0;
+                }
+              }
+            }
+            return false;
+          }
+        }
+      }
+      return true;
+    }
   };
 
-  const handleClick = () => {
-    solveTable();
-  };
   const handleReset = () => {
-    setData(getNewTable());
+    setData(getNewTable);
+    setSolved(false);
+    setErr(false);
+    console.log("new data");
   };
   const handleChange = (event, row, col) => {
-    console.log(event.target.value);
     var newVal = parseInt(event.target.value) || 0,
       NewGrid = data;
     if (newVal === 0 || (newVal >= 1 && newVal <= 9)) {
@@ -50,7 +97,85 @@ function Sudoku() {
     }
     setData(NewGrid);
   };
-  return (
+  return !solved ? (
+    <SudokuTableWraper>
+      <table>
+        <tbody>
+          {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((row, rInd) => {
+            return (
+              <tr key={rInd} className={(row + 1) % 3 === 0 ? "bBorder" : ""}>
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((col, cInd) => {
+                  return (
+                    <td
+                      key={rInd + cInd}
+                      className={(col + 1) % 3 === 0 ? "rBorder" : ""}
+                    >
+                      {data.length > 1 ? (
+                        <InputWrapper>
+                          {data[row][col] === 0 ? (
+                            <input
+                              onChange={(e) => handleChange(e, row, col)}
+                              className={"input-wrap"}
+                            />
+                          ) : (
+                            <div className={"disable"}>{data[row][col]}</div>
+                          )}
+                        </InputWrapper>
+                      ) : (
+                        <></>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <ButtonWrapper>
+        <button onClick={solveTable} className={"button"}>
+          Solve
+        </button>
+        <button onClick={handleReset} className={"button"}>
+          Reset
+        </button>
+      </ButtonWrapper>
+    </SudokuTableWraper>
+  ) : err ? (
+    <SudokuTableWraper>
+      {window.alert("No Possible Solution")}
+      <table>
+        <tbody>
+          {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((row, rInd) => {
+            return (
+              <tr key={rInd} className={(row + 1) % 3 === 0 ? "bBorder" : ""}>
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((col, cInd) => {
+                  return (
+                    <td
+                      key={rInd + cInd}
+                      className={(col + 1) % 3 === 0 ? "rBorder" : ""}
+                    >
+                      <InputWrapper>
+                        <div className={"disable"}>X</div>
+                      </InputWrapper>
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <ButtonWrapper>
+        <button onClick={solveTable} className={"button"}>
+          Solve
+        </button>
+        <button onClick={handleReset} className={"button"}>
+          Reset
+        </button>
+      </ButtonWrapper>
+    </SudokuTableWraper>
+  ) : (
     <SudokuTableWraper>
       <table>
         <tbody>
@@ -64,14 +189,7 @@ function Sudoku() {
                       className={(col + 1) % 3 === 0 ? "rBorder" : ""}
                     >
                       <InputWrapper>
-                        {data[row][col] === 0 ? (
-                          <input
-                            onChange={(e) => handleChange(e, row, col)}
-                            className={"input-wrap"}
-                          />
-                        ) : (
-                          <div className={"disable"}>{data[row][col]}</div>
-                        )}
+                        <div className={"disable"}>{data[row][col]}</div>
                       </InputWrapper>
                     </td>
                   );
@@ -82,7 +200,7 @@ function Sudoku() {
         </tbody>
       </table>
       <ButtonWrapper>
-        <button onClick={handleClick} className={"button"}>
+        <button onClick={solveTable} className={"button"}>
           Solve
         </button>
         <button onClick={handleReset} className={"button"}>
