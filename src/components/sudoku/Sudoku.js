@@ -40,7 +40,7 @@ function Sudoku() {
 
   const solveTable = () => {
     const _board = data;
-    sodokoSolver(_board);
+    Solve(_board);
     setData(_board);
     setSolved(true);
     for (var i = 0; i < 9; i++) {
@@ -61,14 +61,14 @@ function Sudoku() {
       return true;
     }
 
-    function sodokoSolver(data) {
+    function Solve(data) {
       for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
           if (data[i][j] === 0) {
             for (let k = 1; k <= 9; k++) {
               if (isValid(data, i, j, k)) {
                 data[i][j] = k;
-                if (sodokoSolver(data)) {
+                if (Solve(data)) {
                   return true;
                 } else {
                   data[i][j] = 0;
